@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  webproxy:
+    image: camillysouza/nginx-loadbalancer
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - wordpress
+
+  webserver:
+    image: wordpress:latest
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: vagrant-database-1
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_password
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - app:/var/www/html
+    networks:
+      - wordpress
+  
+  database:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp_user         
+      MYSQL_PASSWORD: wp_password  
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - my:/var/lib/mysql
+    networks:
+      - wordpress
+
+
+networks:
+  wordpress:
+
+volumes:
+  app:
+  my:
+

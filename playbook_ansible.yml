@@ -1,0 +1,55 @@
+- name: Provisionar Servidor com Ansible
+  hosts: all
+  become: yes
+  tasks:
+    - name: Alterar hostname
+      hostname:
+        name: "server.Camilly.Souza"
+
+    - name: Atualizar pacotes do sistema
+      apt:
+        update_cache: yes
+
+    - name: Instalar pacotes essenciais
+      apt:
+        name:
+          - curl
+          - vim
+          - git
+          - unzip
+        state: present
+
+    - name: Verificar se o Docker já está instalado
+      command: which docker
+      register: docker_installed
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Instalar Docker (se necessário)
+      shell: |
+        curl -fsSL https://get.docker.com | sh
+        usermod -aG docker vagrant
+      when: docker_installed.rc != 0
+
+    - name: Verificar se o Docker Compose já está instalado
+      stat:
+        path: /usr/local/bin/docker-compose
+      register: docker_compose_installed
+
+    - name: Instalar Docker Compose (se necessário)
+      get_url:
+        url: "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-linux-x86_64"
+        dest: "/usr/local/bin/docker-compose"
+        mode: '0755'
+      when: not docker_compose_installed.stat.exists
+
+    - name: Copiar arquivos do Docker Compose
+      copy:
+        src: docker-compose.yml
+        dest: /home/vagrant/docker-compose.yml
+
+    - name: Subir os containers
+      shell: |
+        cd /home/vagrant
+        docker-compose up -d
+
