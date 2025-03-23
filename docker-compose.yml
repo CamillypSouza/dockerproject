@@ -13,7 +13,7 @@ services:
     image: wordpress:latest
     restart: always
     environment:
-      WORDPRESS_DB_HOST: vagrant-database-1
+      WORDPRESS_DB_HOST: database
       WORDPRESS_DB_USER: wp_user
       WORDPRESS_DB_PASSWORD: wp_password
       WORDPRESS_DB_NAME: wordpress
@@ -21,6 +21,8 @@ services:
       - app:/var/www/html
     networks:
       - wordpress
+    depends_on:
+      - database
   
   database:
     image: mysql:5.7
@@ -35,11 +37,12 @@ services:
     networks:
       - wordpress
 
-
 networks:
   wordpress:
 
 volumes:
   app:
   my:
+
+
 
