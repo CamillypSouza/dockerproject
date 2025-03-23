@@ -30,7 +30,7 @@
         curl -fsSL https://get.docker.com | sh
         usermod -aG docker vagrant
       when: docker_installed.rc != 0
-
+  
     - name: Verificar se o Docker Compose já está instalado
       stat:
         path: /usr/local/bin/docker-compose
@@ -48,8 +48,8 @@
         src: docker-compose.yml
         dest: /home/vagrant/docker-compose.yml
 
-    - name: Subir os containers
+    - name: Subir os containers com Docker Compose
       shell: |
         cd /home/vagrant
+        docker-compose down || true
         docker-compose up -d
-
